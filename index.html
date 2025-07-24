@@ -198,7 +198,7 @@
     </div>
 
     <!-- Main Application -->
-    <div id="main-app" class="min-h-screen flex flex-col">
+    <div id="main-app" class="min-h-screen flex-col hidden">
         <nav class="glass-panel py-4 px-6 flex items-center justify-between sticky top-0 z-50">
             <div class="flex items-center space-x-3">
                 <div class="bg-gradient-to-r from-primary-500 to-secondary-500 p-1.5 rounded-xl">
@@ -230,12 +230,18 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notification-btn" class="text-gray-400 hover:text-gray-200">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                        </button>
+                    </div>
 
                     <div class="relative">
                         <button id="user-menu" class="flex items-center space-x-2 focus:outline-none">
                             <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
+                                class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center" id="user-avatar-container">
                                 <span class="font-bold text-white" id="user-initials">U</span>
                             </div>
                             <span class="text-gray-200 hidden md:inline" id="user-name">User</span>
@@ -379,6 +385,11 @@
                             <!-- Dynamic tasks will be added here -->
                         </div>
                     </div>
+                </div>
+
+                <!-- ADD THIS NEW CONTAINER FOR THE LIST VIEW -->
+                <div id="list-container" class="hidden space-y-3 mb-12">
+                    <!-- This container will be populated by JavaScript -->
                 </div>
 
                 <!-- Dynamic Statistics -->
@@ -568,7 +579,7 @@
                                     </div>
                                     <div>
                                         <p class="text-gray-400">Average Completion</p>
-                                        <p class="text-2xl font-bold text-gray-100">2.8 days</p>
+                                        <p class="text-2xl font-bold text-gray-100" id="avg-completion">N/A</p>
                                     </div>
                                 </div>
                             </div>
@@ -579,7 +590,7 @@
                                     </div>
                                     <div>
                                         <p class="text-gray-400">Completion Rate</p>
-                                        <p class="text-2xl font-bold text-gray-100">78%</p>
+                                        <p class="text-2xl font-bold text-gray-100" id="completion-rate">0%</p>
                                     </div>
                                 </div>
                             </div>
@@ -590,7 +601,7 @@
                                     </div>
                                     <div>
                                         <p class="text-gray-400">Best Streak</p>
-                                        <p class="text-2xl font-bold text-gray-100">14 days</p>
+                                        <p class="text-2xl font-bold text-gray-100" id="best-streak">0 days</p>
                                     </div>
                                 </div>
                             </div>
@@ -611,13 +622,14 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-6 rounded-xl lg:col-span-1">
                         <div class="flex flex-col items-center mb-6">
-                            <div
+                            <div id="profile-avatar-container"
                                 class="w-24 h-24 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white text-3xl font-bold mb-4">
                                 <span id="profile-initials">U</span>
                             </div>
                             <h3 class="text-xl font-bold text-gray-100" id="profile-name">User Name</h3>
                             <p class="text-gray-400" id="profile-email">user@example.com</p>
-                            <button class="mt-4 text-sm text-primary-400 hover:text-primary-300">
+                            <input type="file" id="avatar-upload" class="hidden" accept="image/*">
+                            <button id="change-avatar-btn" class="mt-4 text-sm text-primary-400 hover:text-primary-300">
                                 <i class="fas fa-camera mr-1"></i> Change Avatar
                             </button>
                         </div>
@@ -698,18 +710,6 @@
                                 data-section="theme">
                                 <i class="fas fa-palette mr-3"></i> Theme
                             </button>
-                            <button class="settings-nav-btn w-full text-left p-3 rounded-lg hover:bg-gray-700"
-                                data-section="notifications">
-                                <i class="fas fa-bell mr-3"></i> Notifications
-                            </button>
-                            <button class="settings-nav-btn w-full text-left p-3 rounded-lg hover:bg-gray-700"
-                                data-section="security">
-                                <i class="fas fa-shield-alt mr-3"></i> Security
-                            </button>
-                            <button class="settings-nav-btn w-full text-left p-3 rounded-lg hover:bg-gray-700"
-                                data-section="preferences">
-                                <i class="fas fa-sliders-h mr-3"></i> Preferences
-                            </button>
                         </div>
                     </div>
 
@@ -723,7 +723,7 @@
                                     <label class="block text-gray-400 text-sm mb-2">Change Email</label>
                                     <input type="email" id="settings-email"
                                         class="glass-panel w-full py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                        placeholder="Enter new email">
+                                        placeholder="Enter new email" disabled>
                                 </div>
 
                                 <div>
@@ -753,37 +753,26 @@
                                 <div>
                                     <h4 class="text-gray-300 mb-3">Color Theme</h4>
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div
+                                        <div data-theme="nexus"
                                             class="theme-option bg-gradient-to-br from-primary-500 to-secondary-500 h-32 rounded-xl cursor-pointer flex items-center justify-center">
                                             <span class="text-white font-medium">Nexus</span>
                                         </div>
-                                        <div
+                                        <div data-theme="ocean"
                                             class="theme-option bg-gradient-to-br from-blue-500 to-cyan-500 h-32 rounded-xl cursor-pointer flex items-center justify-center">
                                             <span class="text-white font-medium">Ocean</span>
                                         </div>
-                                        <div
+                                        <div data-theme="sunset"
                                             class="theme-option bg-gradient-to-br from-purple-500 to-pink-500 h-32 rounded-xl cursor-pointer flex items-center justify-center">
                                             <span class="text-white font-medium">Sunset</span>
                                         </div>
-                                        <div
+                                        <div data-theme="emerald"
                                             class="theme-option bg-gradient-to-br from-green-500 to-teal-500 h-32 rounded-xl cursor-pointer flex items-center justify-center">
                                             <span class="text-white font-medium">Emerald</span>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div>
-                                    <h4 class="text-gray-300 mb-3">Appearance</h4>
-
-                                    <button
-                                        class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-2.5 px-6 rounded-xl">
-                                        Apply Theme
-                                    </button>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- Other settings sections would go here -->
                     </div>
                 </div>
             </div>
@@ -968,8 +957,25 @@
             </button>
         </div>
     </div>
+    
+    <!-- Command Palette Modal -->
+    <div id="command-palette" class="fixed inset-0 bg-black/70 z-[100] hidden items-start justify-center pt-24 p-4">
+        <div class="glass-panel rounded-2xl w-full max-w-xl transform transition-all" id="command-palette-content">
+            <div class="p-2">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="command-input" placeholder="Type a command or search..." class="w-full bg-transparent text-lg py-3 pl-12 pr-4 text-gray-100 placeholder-gray-500 focus:outline-none">
+                </div>
+                <div id="command-list" class="mt-2 max-h-80 overflow-y-auto">
+                    <!-- Commands will be rendered here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module" src="script.js"></script>
+
 </body>
 
 </html>

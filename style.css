@@ -22,6 +22,35 @@
     --border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Theme variables */
+.nexus-theme {
+    --primary-500: #2fa5ff;
+    --primary-600: #0d87f5;
+    --secondary-500: #c63aee;
+    --secondary-600: #b01bd3;
+}
+
+.ocean-theme {
+    --primary-500: #3b82f6;
+    --primary-600: #2563eb;
+    --secondary-500: #14b8a6;
+    --secondary-600: #0d9488;
+}
+
+.sunset-theme {
+    --primary-500: #a855f7;
+    --primary-600: #9333ea;
+    --secondary-500: #ec4899;
+    --secondary-600: #db2777;
+}
+
+.emerald-theme {
+    --primary-500: #10b981;
+    --primary-600: #059669;
+    --secondary-500: #14b8a6;
+    --secondary-600: #0d9488;
+}
+
 body {
     background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     min-height: 100vh;
@@ -188,4 +217,34 @@ body.light {
     .column { min-height: 300px; }
     .task-card { min-height: 120px; }
     .mobile-menu { display: block; }
+}
+
+.task-list-item {
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.task-list-item:hover {
+    background-color: rgba(40, 40, 60, 0.7);
+}
+
+/* Command Palette Styles */
+.command-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.command-item.active,
+.command-item:hover {
+    background-color: rgba(99, 102, 241, 0.2); /* A neutral highlight color */
+}
+
+.command-item i {
+    width: 2rem;
+    text-align: center;
+    margin-right: 0.75rem;
+    color: #a0aec0; /* text-secondary */
 }
