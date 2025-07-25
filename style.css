@@ -248,3 +248,30 @@ body.light {
     margin-right: 0.75rem;
     color: #a0aec0; /* text-secondary */
 }
+
+/* Password toggle button styles */
+.password-toggle-btn {
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.password-toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+.password-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Ensure proper spacing for the eye icon */
+.password-input-with-toggle {
+    padding-right: 3rem;
+}
+
+/* Light mode adjustments */
+.light .password-toggle-btn {
+    color: #4a5568;
+}
+
+.light .password-toggle-btn:hover {
+    color: #2d3748;
+}

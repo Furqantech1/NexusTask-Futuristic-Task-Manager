@@ -184,17 +184,81 @@ async function handleRegister(e) {
 
 async function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('login-email').value;
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
+
+    if (!validateLoginForm(email, password)) {
+        return;
+    }
 
     try {
         await signInWithEmailAndPassword(auth, email, password);
         showToast('Welcome back!', 'success');
     } catch (error) {
         console.error("Login Error:", error);
-        showToast(error.message, 'error');
+        console.error("Error Code:", error.code);
+        
+        // Handle specific error cases - ADD the new error code here
+        if (error.code === 'auth/user-not-found' || 
+            error.code === 'auth/invalid-credential' ||
+            error.code === 'auth/invalid-login-credentials') {  // Add this line
+            
+            showToast('No account found with this email. Please sign up first.', 'error');
+            // Auto-switch to registration form after 2 seconds
+            setTimeout(() => {
+                switchToRegisterForm();
+            }, 2000);
+            
+        } else if (error.code === 'auth/wrong-password') {
+            showToast('Incorrect password. Please try again.', 'error');
+        } else if (error.code === 'auth/invalid-email') {
+            showToast('Please enter a valid email address.', 'error');
+        } else if (error.code === 'auth/too-many-requests') {
+            showToast('Too many failed attempts. Please try again later.', 'error');
+        } else {
+            showToast('Login failed. Please check your credentials.', 'error');
+        }
     }
 }
+
+
+function validateLoginForm(email, password) {
+    if (!email || !password) {
+        showToast('Please fill in all fields.', 'error');
+        return false;
+    }
+    
+    if (!email.includes('@')) {
+        showToast('Please enter a valid email address.', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+function switchToRegisterForm() {
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const toggleBtn = document.getElementById('toggle-auth');
+    const subtitle = document.getElementById('auth-subtitle');
+
+    // Switch to register form
+    loginForm.classList.add('hidden');
+    registerForm.classList.remove('hidden');
+    toggleBtn.textContent = "Already have an account? Sign in";
+    subtitle.textContent = "Create a new account";
+    
+    // Pre-fill email if provided
+    const loginEmail = document.getElementById('login-email').value;
+    if (loginEmail) {
+        document.getElementById('register-email').value = loginEmail;
+    }
+    
+    // Focus on name field for better UX
+    document.getElementById('register-name').focus();
+}
+
+
 
 async function handleSignOut() {
     try {
@@ -1317,3 +1381,47 @@ function updatePerformanceMetrics() {
     const completionRate = tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0;
     document.getElementById('completion-rate').textContent = `${completionRate.toFixed(0)}%`;
 }
+
+// Password toggle functionality
+function initializePasswordToggles() {
+    // Login password toggle
+    const loginToggle = document.getElementById('toggle-login-password');
+    const loginPassword = document.getElementById('login-password');
+    const loginEyeIcon = document.getElementById('login-eye-icon');
+
+    if (loginToggle && loginPassword) {
+        loginToggle.addEventListener('click', function() {
+            togglePasswordVisibility(loginPassword, loginEyeIcon);
+        });
+    }
+
+    // Register password toggle
+    const registerToggle = document.getElementById('toggle-register-password');
+    const registerPassword = document.getElementById('register-password');
+    const registerEyeIcon = document.getElementById('register-eye-icon');
+
+    if (registerToggle && registerPassword) {
+        registerToggle.addEventListener('click', function() {
+            togglePasswordVisibility(registerPassword, registerEyeIcon);
+        });
+    }
+}
+
+function togglePasswordVisibility(passwordField, eyeIcon) {
+    if (passwordField.type === 'password') {
+        // Show password
+        passwordField.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        // Hide password
+        passwordField.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializePasswordToggles();
+});
